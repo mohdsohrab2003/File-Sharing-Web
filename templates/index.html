@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block homepage %}
+<!-- Welcome Text -->
+<div class="margin-top container mx-auto text-center" style="margin-top: 100px;">
+    <h1 class="text-4xl font-bold text-gray-800 dark:text-gray-200">Welcome to Send Everywhere!</h1>
+    <p class="text-lg text-gray-600 dark:text-gray-400  mt-2">Please upload your file or enter your code below.</p>
+</div>
+
+<div class="container mx-auto mt-8 flex justify-center">
+    <div class="w-full max-w-md">
+        <div
+            class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md mb-8 flex flex-col items-center justify-center h-48">
+            {% if Link %}
+            <div class="mb-4">
+                <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2" for="request_code">Your
+                    Link</label>
+                <div class="flex items-center justify-between mt-3">
+                    <input type="text" name="request_code" value="{{ Link }}" id="Link"
+                        class="shadow appearance-none border rounded w-70% py-2 px-3 text-gray-700 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline">
+                    <button onclick="copyToClipboard()" style="margin-left: 10px;"
+                        class=" bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">Copy
+                        text</button>
+                </div>
+            </div>
+            {% elif request_code %}
+            <div class="flex space-x-2">
+                {% for char in request_code %}
+                <div
+                    class="dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 bg-white border border-gray-300 text-gray-800 font-bold py-4 px-4 rounded text-center text-xl">
+                    {{ char }}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <form action="/" method="POST" enctype="multipart/form-data"
+                class="flex flex-col items-center justify-center h-full w-full">
+                <div id="upload-section" class="flex flex-col items-center justify-center text-center">
+                    <label for="file" class="cursor-pointer flex flex-col items-center justify-center">
+                        <span class="text-lg font-bold text-gray-700 dark:text-gray-200">Send</span>
+                        <div class="text-9xl text-red-500 flex items-center h-23">+</div>
+                        <input type="file" name="file" id="file" class="hidden">
+                    </label>
+                </div>
+
+                <div id="file-info-section" class="hidden flex flex-col items-center text-center">
+                    <span id="file-name" class="text-lg font-bold text-gray-700 dark:text-gray-200  mb-4"></span>
+                    <div class="flex gap-4">
+                        <button type="submit" name="request_code"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            Get Code
+                        </button>
+                        {% if user.is_authenticated %}
+                        <button type="submit" name="request_link"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            Get Link
+                        </button>
+
+                        <a href="/download"
+                            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                            Email
+                        </a>
+                        {% else %}
+                        <button disabled
+                            class="bg-gray-300 cursor-not-allowed opacity-70 text-gray-600 font-bold py-2 px-4 rounded focus:outline-none focus:ring-2 focus:ring-gray-500">
+                            Get Link
+                        </button>
+
+                        <button disabled
+                            class="bg-gray-300 cursor-not-allowed opacity-70 text-gray-600 font-bold py-2 px-4 rounded focus:outline-none focus:focus:ring-2 focus:ring-gray-500">
+                            Email
+                        </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+            {% endif %}
+        </div>
+        <div class="bg-gray-50 dark:bg-gray-900 p-6 rounded border border-gray-200 dark:border-gray-700 shadow-sm">
+            <form action="/" method="GET">
+                <div class="mb-4">
+                    <label class="block text-gray-700 dark:text-gray-300 text-sm font-bold mb-2"
+                        for="request_code">Enter your
+                        code</label>
+                    <input type="text" name="request_code" placeholder="Enter your code"
+                        class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 dark:bg-gray-900 dark:text-gray-200 leading-tight focus:outline-none focus:shadow-outline">
+                </div>
+                <div class="flex items-center justify-between">
+                    <button type="submit"
+                        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('file').addEventListener('change', function () {
+        const fileNameElement = document.getElementById('file-name');
+        const uploadSection = document.getElementById('upload-section');
+        const fileInfoSection = document.getElementById('file-info-section');
+        if (this.files.length > 0) {
+            const fileName = this.files[0].name;
+            fileNameElement.textContent = fileName;
+            uploadSection.classList.add('hidden');
+            fileInfoSection.classList.remove('hidden');
+        } else {
+            uploadSection.classList.remove('hidden');
+            fileInfoSection.classList.add('hidden');
+        }
+    });
+
+    function copyToClipboard() {
+        // Get the text field
+        var copyText = document.getElementById("Link");
+
+        // Select the text field
+        copyText.select();
+        copyText.setSelectionRange(0, 99999); // For mobile devices
+
+        // Copy the text inside the text field
+        navigator.clipboard.writeText(copyText.value);
+
+        // Alert the copied text
+        alert("Copied the text: " + copyText.value);
+    }
+
+</script>
+
+{% endblock %}
